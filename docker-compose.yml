@@ -1,15 +1,14 @@
-version: '3.9'
-
 services:
   ntp:
     build: .
-    image: cturra/ntp:latest
+    image: mr-ingenious/ntp:latest
     container_name: ntp
     restart: always
     ports:
       - 123:123/udp
+      - 80:80/tcp
     environment:
-      - NTP_SERVERS=time.cloudflare.com
+      - NTP_SERVERS="1.pool.ntp.org,2.pool.ntp.org,3.pool.ntp.org,ntp3.fau.de,ntp2.fau.de,ntp1.fau.de,ntp0.fau.de,time.fu-berlin.de,zeit.fu-berlin.de,0.de.pool.ntp.org,tbtime1.ptb.de,ptbtime2.ptb.de,ptbtime3.ptb.de,2.europe.pool.ntp.org"
       - LOG_LEVEL=0
 #      - TZ=America/Vancouver
 #      - NOCLIENTLOG=true

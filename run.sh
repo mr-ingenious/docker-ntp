@@ -1,9 +1,11 @@
 #!/bin/bash
 
 # grab global variables
-source vars
+source ./vars
 
 DOCKER=$(which docker)
+
+DETACH_OPT=false
 
 # function to check if container is running
 function check_container() {
@@ -12,10 +14,12 @@ function check_container() {
 
 # function to start new docker container
 function start_container() {
+  echo "starting container ..."
   $DOCKER run --name=${CONTAINER_NAME}             \
-              --detach=true                        \
+              --detach=false               \
               --restart=always                     \
               --publish=123:123/udp                \
+              --publish=80:80/tcp                  \
               --env=NTP_SERVERS=${NTP_SERVERS}     \
 	      --env=ENABLE_NTS=${ENABLE_NTS}       \
 	      --env=NOCLIENTLOG=${NOCLIENTLOG}     \
@@ -30,6 +34,7 @@ function start_container() {
 
 # check if docker container with same name is already running.
 if [ "$(check_container)" != "" ]; then
+  echo "container with same name already running ..."
   # container found...
   # 1) rename existing container
   $DOCKER rename ${CONTAINER_NAME} "${CONTAINER_NAME}_orig" > /dev/null 2>&1
@@ -47,5 +52,6 @@ if [ "$(check_container)" != "" ]; then
 
 # no docker container found. start a new one.
 else
+  echo "no container with same name is running, start it ..."
   start_container
 fi

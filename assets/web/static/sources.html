@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="20">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css">
+  <title>Chrony</title>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <h1>Sources</h1>
+    <div class="card mt-3 mr-3 ml-3" id="info">
+      <table class="table table-striped table-hover" id="sources">
+        <thead>
+          <tr>
+            <th scope="col">MS</th>
+            <th scope="col">Name</th>
+            <th scope="col">Stratum</th>
+            <th scope="col">Poll</th>
+            <th scope="col">Reach</th>
+            <th scope="col">Last rx</th>
+            <th scope="col">Last Sample</th>
+          </tr>
+        </thead>
+        <tbody id="sources_body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const p = document.getElementById('sources_body');
+    const myRequest = new Request("/api/chrony/sources");
+
+    fetch(myRequest)
+      .then((response) => response.json())
+      .then((info) => {
+        console.log(info)
+
+        for (let i = 0; i < info.sources.length; i++) {
+          const tr = document.createElement("tr")
+          const td_ms = document.createElement("td")
+          const td_name = document.createElement("td")
+          const td_stratum = document.createElement("td")
+          const td_poll = document.createElement("td")
+          const td_reach = document.createElement("td")
+          const td_lastrx = document.createElement("td")
+          const td_lastsample = document.createElement("td")
+          console.log("# " + i + ": " + info.sources[i].name)
+
+          td_ms.innerHTML = info.sources[i].ms
+          td_name.innerHTML = info.sources[i].name
+          td_stratum.innerHTML = info.sources[i].stratum
+          td_poll.innerHTML = info.sources[i].poll
+          td_reach.innerHTML = info.sources[i].reach
+          td_lastrx.innerHTML = info.sources[i].last_rx
+          td_lastsample.innerHTML = info.sources[i].last_sample
+
+          tr.appendChild(td_ms)
+          tr.appendChild(td_name)
+          tr.appendChild(td_stratum)
+          tr.appendChild(td_poll)
+          tr.appendChild(td_reach)
+          tr.appendChild(td_lastrx)
+          tr.appendChild(td_lastsample)
+
+          p.appendChild(tr)
+        }
+      })
+      .catch(console.error);
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
