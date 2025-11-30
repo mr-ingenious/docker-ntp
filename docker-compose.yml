@@ -1,7 +1,7 @@
 services:
   ntp:
     build: .
-    image: mr-ingenious/ntp:latest
+    image: mringenious/ntp:latest
     container_name: ntp
     restart: always
     ports:

@@ -12,7 +12,7 @@ This container runs [chrony](https://chrony-project.org/) on [Alpine Linux](http
 
 ## Supported Architectures
 
-Architectures officially supported by this Docker container. Simply pulling this container from [Docker Hub](https://hub.docker.com/r/cturra/ntp) should retrieve the correct image for your architecture.
+Architectures officially supported by this Docker container. Simply pulling this container from [Docker Hub](https://hub.docker.com/r/mringenious/ntp) should retrieve the correct image for your architecture.
 
 ![Linux x86-64](https://img.shields.io/badge/linux/amd64-green?style=flat-square)
 ![ARMv8 64-bit](https://img.shields.io/badge/linux/arm64-green?style=flat-square)
@@ -31,25 +31,27 @@ Pull and run -- it's this simple.
 
 ```
 # pull from docker hub
-$> docker pull cturra/ntp
+$> docker pull mringenious/ntp
 
 # run ntp
 $> docker run --name=ntp            \
               --restart=always      \
               --detach              \
               --publish=123:123/udp \
-              cturra/ntp
+              --publish=80:80/tcp   \
+              mringenious/ntp
 
 # OR run ntp with higher security
 $> docker run --name=ntp                           \
               --restart=always                     \
               --detach                             \
               --publish=123:123/udp                \
+              --publish=80:80/tcp                  \
               --read-only                          \
               --tmpfs=/etc/chrony:rw,mode=1750     \
               --tmpfs=/run/chrony:rw,mode=1750     \
               --tmpfs=/var/lib/chrony:rw,mode=1750 \
-              cturra/ntp
+              mringenious/ntp
 ```
 
 
@@ -273,6 +275,3 @@ have priviledge (for good reason) to modify the clock on the system.
 
 Like any host on your network, simply use your preferred ntp client to pull the time from
 the running ntp container on your container host.
-
----
-<a href="https://www.buymeacoffee.com/cturra" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
