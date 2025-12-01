@@ -19,8 +19,15 @@
         <thead>
           <tr>
             <th scope="col">Hostname</th>
-            <th scope="col">NTP</th>
-            <th scope="col">Info</th>
+            <th scope="col">NTP rx</th>
+            <th scope="col">NTP dropped</th>
+            <th scope="col">NTP interval</th>
+            <th scope="col">NTP interval2</th>
+            <th scope="col">NTP last rx</th>
+            <th scope="col">NTS-KE rx</th>
+            <th scope="col">NTS-KE dropped</th>
+            <th scope="col">NTS-KE interval</th>
+            <th scope="col">NTS-KE last rx</th>
           </tr>
         </thead>
         <tbody id="clients_body"></tbody>
@@ -40,19 +47,39 @@
         for (let i = 0; i < info.clients.length; i++) {
           const tr = document.createElement("tr")
           const td_hostname = document.createElement("td")
-          const td_ntp = document.createElement("td")
-          const td_info = document.createElement("td")
+          const td_ntp_received = document.createElement("td")
+          const td_ntp_dropped = document.createElement("td")
+          const td_ntp_int = document.createElement("td")
+          const td_ntp_int_rr = document.createElement("td")
+          const td_ntp_last_received = document.createElement("td")
+          const td_ntske_received = document.createElement("td")
+          const td_ntske_dropped = document.createElement("td")
+          const td_ntske_interval = document.createElement("td")
+          const td_ntske_last_received = document.createElement("td")
 
           console.log("# " + i + ": " + info.clients[i].name)
 
           td_hostname.innerHTML = info.clients[i].hostname
-          td_ntp.innerHTML = info.clients[i].ntp
-          td_info.innerHTML = info.clients[i].aux
+          td_ntp_received.innerHTML = info.clients[i].ntp_received
+          td_ntp_dropped.innerHTML = info.clients[i].ntp_dropped
+          td_ntp_int.innerHTML = info.clients[i].ntp_interval
+          td_ntp_int_rr.innerHTML = info.clients[i].ntp_interval_rr
+          td_ntp_last_received.innerHTML = info.clients[i].ntp_last_received
+          td_ntske_received.innerHTML = info.clients[i].ntske_received
+          td_ntske_dropped.innerHTML = info.clients[i].ntske_dropped
+          td_ntske_interval.innerHTML = info.clients[i].ntske_interval
+          td_ntske_last_received.innerHTML = info.clients[i].ntske_last_received
 
           tr.appendChild(td_hostname)
-          tr.appendChild(td_ntp)
-          tr.appendChild(td_info)
-
+          tr.appendChild(td_ntp_received)
+          tr.appendChild(td_ntp_dropped)
+          tr.appendChild(td_ntp_int)
+          tr.appendChild(td_ntp_int_rr)
+          tr.appendChild(td_ntp_last_received)
+          tr.appendChild(td_ntske_received)
+          tr.appendChild(td_ntske_dropped)
+          tr.appendChild(td_ntske_interval)
+          tr.appendChild(td_ntske_last_received)
           p.appendChild(tr)
         }
       })

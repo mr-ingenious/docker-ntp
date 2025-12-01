@@ -44,10 +44,29 @@ type Source struct {
 	LastSample string `json:"last_sample"`
 }
 
+/*
+The hostname of the client.
+The number of NTP packets received from the client.
+The number of NTP packets dropped to limit the response rate.
+The average interval between NTP packets.
+The average interval between NTP packets after limiting the response rate.
+Time since the last NTP packet was received
+The number of command packets or NTS-KE connections received/accepted from the client.
+The number of command packets or NTS-KE connections dropped to limit the response rate.
+The average interval between command packets or NTS-KE connections.
+Time since the last command packet or NTS-KE connection was received/accepted.
+*/
 type Client struct {
-	Hostname string `json:"hostname"`
-	Ntp      string `json:"ntp"`
-	Aux      string `json:"aux"`
+	Hostname                       string `json:"hostname"`
+	NtpPacketsReceived             string `json:"ntp_received"`
+	NtpPacketsDropped              string `json:"ntp_dropped"`
+	NtpAverageInterval             string `json:"ntp_interval"`
+	NtpAverageIntervalAfterRRLimit string `json:"ntp_interval_rr"`
+	NtpTimeSinceLastReceived       string `json:"ntp_last_received"`
+	NtsKEReceived                  string `json:"ntske_received"`
+	NtsKEDropped                   string `json:"ntske_dropped"`
+	NtsKEAverageInterval           string `json:"ntske_interval"`
+	NtsKETimeSinceLastReceived     string `json:"ntske_last_received"`
 }
 
 type ClientsResult struct {
@@ -288,10 +307,13 @@ func chrony_sources(w http.ResponseWriter, req *http.Request) {
 }
 
 /*
+/ $ chronyc clients
 Hostname                      NTP   Drop Int IntL Last     Cmd   Drop Int  Last
 ===============================================================================
-localhost                       0      0   -   -     -    1643      0  -5   14h
+testclient1                  187      0   9   -   128       0      0   -     -
+testclient2                   78      0  10   -  1035       0      0   -     -
 */
+
 func chrony_clients(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("webserver: requested chrony clients info.")
 
@@ -313,8 +335,91 @@ func chrony_clients(w http.ResponseWriter, req *http.Request) {
 		kv := strings.Fields(line)
 		// fmt.Println("# KV: ", kv, " length: ", len(kv))
 
+		if len(kv) == 10 {
+			item := Client{
+				Hostname:                       kv[0],
+				NtpPacketsReceived:             kv[1],
+				NtpPacketsDropped:              kv[2],
+				NtpAverageInterval:             kv[3],
+				NtpAverageIntervalAfterRRLimit: kv[4],
+				NtpTimeSinceLastReceived:       kv[5],
+				NtsKEReceived:                  kv[6],
+				NtsKEDropped:                   kv[7],
+				NtsKEAverageInterval:           kv[8],
+				NtsKETimeSinceLastReceived:     kv[9],
+			}
+			clients = append(clients, item)
+		}
+	}
+
+	result := &ClientsResult{
+		Clients: clients,
+	}
+
+	// b, err := json.Marshal(result)
+	b, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return
+	}
+
+	fmt.Println("JSON:", string(b))
+
+	if err := scanner.Err(); err != nil {
+		fmt.Printf("error occurred: %v\n", err)
+	}
+
+	fmt.Fprintf(w, "%s", b)
+}
+
+/*
+NTP packets received       : 330
+NTP packets dropped        : 0
+Command packets received   : 7087
+Command packets dropped    : 0
+Client log records dropped : 0
+NTS-KE connections accepted: 0
+NTS-KE connections dropped : 0
+Authenticated NTP packets  : 0
+Interleaved NTP packets    : 0
+NTP timestamps held        : 0
+NTP timestamp span         : 0
+NTP daemon RX timestamps   : 0
+NTP daemon TX timestamps   : 330
+NTP kernel RX timestamps   : 330
+NTP kernel TX timestamps   : 0
+NTP hardware RX timestamps : 0
+NTP hardware TX timestamps : 0
+*/
+
+/* ------ WIP -------
+type ServerStatus struct {
+	NtpPacketsReceived   string `json:"ntp_received"`
+	NtpPacketsDropped    string `json:"ntp_dropped"`
+	NtsKEPacketsReceived string `json:"ntske_received"`
+	NtsKEPacketsDropped  string `json:"ntske_dropped"`
+	ClientLogDropped     string `json:"client_log_dropped"`
+}
+
+func chrony_serverstats(w http.ResponseWriter, req *http.Request) {
+	fmt.Println("webserver: requested chrony server statistics.")
+
+	out := chrony_info("clients")
+	// fmt.Printf("chronyc clients:\n%s\n", out)
+
+	scanner := bufio.NewScanner(strings.NewReader(string(out)))
+
+	var clients []Client
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		// fmt.Println("# LINE: ", line)
+
+		kv := strings.Fields(line)
+		// fmt.Println("# KV: ", kv, " length: ", len(kv))
+
 		// if len(kv) == 8 {
-		item := Client{
+		item := ServerStatus{
 			Hostname: kv[0],
 			Ntp:      kv[1],
 			Aux:      kv[2],
@@ -344,6 +449,7 @@ func chrony_clients(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprintf(w, "%s", b)
 }
+*/
 
 func main() {
 	fileServer := http.FileServer(http.Dir("/opt/www"))

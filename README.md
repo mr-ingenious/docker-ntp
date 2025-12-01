@@ -72,22 +72,6 @@ $> docker compose logs ntp
 ```
 
 
-### With Docker Swarm
-
-*(These instructions assume you already have a swarm)*
-
-```
-# deploy ntp stack to the swarm
-$> docker stack deploy -c docker-compose.yml cturra
-
-# check that service is running
-$> docker stack services cturra
-
-# (optional) view the ntp logs
-$> docker service logs -f cturra_ntp
-```
-
-
 ### From a Local command line
 
 Using the vars file in this git repo, you can update any of the variables to reflect your
