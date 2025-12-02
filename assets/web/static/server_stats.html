@@ -13,13 +13,13 @@
 
 <body>
   <div class="container mt-5">
-    <h2>Tracking Info</h2>
+    <h2>Server Statistics</h2>
     <div class="card mt-3 mr-3 ml-3" id="info"></div>
   </div>
 
   <script>
     const p = document.getElementById('info');
-    const myRequest = new Request("/api/chrony/tracking");
+    const myRequest = new Request("/api/chrony/serverstats");
 
     const table = document.createElement("table");
     table.setAttribute("class", "table table-striped table-hover")

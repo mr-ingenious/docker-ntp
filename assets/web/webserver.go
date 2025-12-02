@@ -15,8 +15,12 @@ type KeyValue struct {
 	Value string `json:"value"`
 }
 
-type Result struct {
+type TrackingResult struct {
 	Info [13]KeyValue `json:"info"`
+}
+
+type ServerStatsResult struct {
+	Info [17]KeyValue `json:"info"`
 }
 
 type SourceStatus struct {
@@ -116,9 +120,13 @@ func chrony_tracking(w http.ResponseWriter, req *http.Request) {
 		result[i] = pair
 
 		i++
+
+		if i > 12 {
+			break
+		}
 	}
 
-	data := &Result{
+	data := &TrackingResult{
 		Info: result,
 	}
 
@@ -392,56 +400,48 @@ NTP hardware RX timestamps : 0
 NTP hardware TX timestamps : 0
 */
 
-/* ------ WIP -------
-type ServerStatus struct {
-	NtpPacketsReceived   string `json:"ntp_received"`
-	NtpPacketsDropped    string `json:"ntp_dropped"`
-	NtsKEPacketsReceived string `json:"ntske_received"`
-	NtsKEPacketsDropped  string `json:"ntske_dropped"`
-	ClientLogDropped     string `json:"client_log_dropped"`
-}
-
 func chrony_serverstats(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("webserver: requested chrony server statistics.")
+	fmt.Println("webserver: requested chrony serverstats info.")
 
-	out := chrony_info("clients")
-	// fmt.Printf("chronyc clients:\n%s\n", out)
+	out := chrony_info("serverstats")
 
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
 
-	var clients []Client
+	var result [17]KeyValue
 
+	i := 0
 	for scanner.Scan() {
 		line := scanner.Text()
-		// fmt.Println("# LINE: ", line)
+		kv := strings.Split(line, ": ")
+		key := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(strings.ToLower(strings.TrimSpace(kv[0])), " ", "_"), ")", ""), "(", ""), "-", "")
+		value := strings.TrimSpace(kv[1])
 
-		kv := strings.Fields(line)
-		// fmt.Println("# KV: ", kv, " length: ", len(kv))
-
-		// if len(kv) == 8 {
-		item := ServerStatus{
-			Hostname: kv[0],
-			Ntp:      kv[1],
-			Aux:      kv[2],
+		pair := KeyValue{
+			Key:   key,
+			Value: value,
 		}
 
-		clients = append(clients, item)
-		// }
+		result[i] = pair
 
+		i++
+
+		if i > 16 {
+			break
+		}
 	}
 
-	result := &ClientsResult{
-		Clients: clients,
+	data := &ServerStatsResult{
+		Info: result,
 	}
 
-	// b, err := json.Marshal(result)
-	b, err := json.MarshalIndent(result, "", "  ")
+	b, err := json.MarshalIndent(data, "", "  ")
+	// b, err := json.Marshal(data)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
 
-	fmt.Println("JSON:", string(b))
+	// fmt.Println("JSON:", string(b))
 
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("error occurred: %v\n", err)
@@ -449,7 +449,6 @@ func chrony_serverstats(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprintf(w, "%s", b)
 }
-*/
 
 func main() {
 	fileServer := http.FileServer(http.Dir("/opt/www"))
@@ -458,6 +457,7 @@ func main() {
 
 	http.HandleFunc("/api/chrony/tracking", chrony_tracking)
 	http.HandleFunc("/api/chrony/sourcestats", chrony_sourcestats)
+	http.HandleFunc("/api/chrony/serverstats", chrony_serverstats)
 	http.HandleFunc("/api/chrony/sources", chrony_sources)
 	http.HandleFunc("/api/chrony/clients", chrony_clients)
 
