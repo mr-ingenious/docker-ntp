@@ -89,8 +89,6 @@ func chrony_info(option string) []byte {
 		log.Fatal(err)
 	}
 
-	// fmt.Printf ("chronyc response:\n%s\n", out)
-
 	return out
 }
 
@@ -98,7 +96,6 @@ func chrony_tracking(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("webserver: requested chrony tracking info.")
 
 	out := chrony_info("tracking")
-	// fmt.Printf ("chronyc tracking:\n%s\n", out)
 
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
 
@@ -108,7 +105,6 @@ func chrony_tracking(w http.ResponseWriter, req *http.Request) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		kv := strings.Split(line, ": ")
-		// fmt.Println("# ", kv)
 		key := strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(strings.ToLower(strings.TrimSpace(kv[0])), " ", "_"), ")", ""), "(", "")
 		value := strings.TrimSpace(kv[1])
 
@@ -130,14 +126,12 @@ func chrony_tracking(w http.ResponseWriter, req *http.Request) {
 		Info: result,
 	}
 
-	b, err := json.MarshalIndent(data, "", "  ")
-	// b, err := json.Marshal(data)
+	// b, err := json.MarshalIndent(data, "", "  ")
+	b, err := json.Marshal(data)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
-
-	// fmt.Println("JSON:", string(b))
 
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("error occurred: %v\n", err)
@@ -171,7 +165,6 @@ func chrony_sourcestats(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("webserver: requested chrony tracking info.")
 
 	out := chrony_info("sourcestats")
-	// fmt.Printf("chronyc sourcestats:\n%s\n", out)
 
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
 
@@ -183,10 +176,7 @@ func chrony_sourcestats(w http.ResponseWriter, req *http.Request) {
 			continue
 		}
 
-		// fmt.Println("# LINE: ", line)
-
 		kv := strings.Fields(line)
-		// fmt.Println("# KV: ", kv, " length: ", len(kv))
 
 		if len(kv) == 8 {
 			item := SourceStatus{
@@ -202,21 +192,18 @@ func chrony_sourcestats(w http.ResponseWriter, req *http.Request) {
 
 			states = append(states, item)
 		}
-
 	}
 
 	result := &SourceStatsResult{
 		SourceStats: states,
 	}
 
-	// b, err := json.Marshal(result)
-	b, err := json.MarshalIndent(result, "", "  ")
+	b, err := json.Marshal(result)
+	// b, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
-
-	// fmt.Println("JSON:", string(b))
 
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("error occurred: %v\n", err)
@@ -248,7 +235,6 @@ func chrony_sources(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("webserver: requested chrony sources info.")
 
 	out := chrony_info("sources")
-	// fmt.Printf("chronyc sources:\n%s\n", out)
 
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
 
@@ -260,10 +246,7 @@ func chrony_sources(w http.ResponseWriter, req *http.Request) {
 			continue
 		}
 
-		// fmt.Println("# LINE: ", line)
-
 		kv := strings.Fields(line)
-		// fmt.Println("# KV: ", kv, " length: ", len(kv))
 
 		if len(kv) == 9 {
 			item := Source{
@@ -291,21 +274,18 @@ func chrony_sources(w http.ResponseWriter, req *http.Request) {
 
 			sources = append(sources, item)
 		}
-
 	}
 
 	result := &SourcesResult{
 		Sources: sources,
 	}
 
-	// b, err := json.Marshal(result)
-	b, err := json.MarshalIndent(result, "", "  ")
+	b, err := json.Marshal(result)
+	// b, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
-
-	// fmt.Println("JSON:", string(b))
 
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("error occurred: %v\n", err)
@@ -326,7 +306,6 @@ func chrony_clients(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("webserver: requested chrony clients info.")
 
 	out := chrony_info("clients")
-	// fmt.Printf("chronyc clients:\n%s\n", out)
 
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
 
@@ -338,10 +317,7 @@ func chrony_clients(w http.ResponseWriter, req *http.Request) {
 			continue
 		}
 
-		// fmt.Println("# LINE: ", line)
-
 		kv := strings.Fields(line)
-		// fmt.Println("# KV: ", kv, " length: ", len(kv))
 
 		if len(kv) == 10 {
 			item := Client{
@@ -364,14 +340,12 @@ func chrony_clients(w http.ResponseWriter, req *http.Request) {
 		Clients: clients,
 	}
 
-	// b, err := json.Marshal(result)
-	b, err := json.MarshalIndent(result, "", "  ")
+	b, err := json.Marshal(result)
+	// b, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
-
-	fmt.Println("JSON:", string(b))
 
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("error occurred: %v\n", err)
@@ -434,14 +408,12 @@ func chrony_serverstats(w http.ResponseWriter, req *http.Request) {
 		Info: result,
 	}
 
-	b, err := json.MarshalIndent(data, "", "  ")
-	// b, err := json.Marshal(data)
+	// b, err := json.MarshalIndent(data, "", "  ")
+	b, err := json.Marshal(data)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
-
-	// fmt.Println("JSON:", string(b))
 
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("error occurred: %v\n", err)

@@ -42,11 +42,11 @@
     fetch(myRequest)
       .then((response) => response.json())
       .then((info) => {
-        console.log(info)
 
         for (let i = 0; i < info.clients.length; i++) {
           const tr = document.createElement("tr")
-          const td_hostname = document.createElement("td")
+          const td_hostname = document.createElement("th")
+          td_hostname.setAttribute("scope", row)
           const td_ntp_received = document.createElement("td")
           const td_ntp_dropped = document.createElement("td")
           const td_ntp_int = document.createElement("td")
@@ -56,8 +56,6 @@
           const td_ntske_dropped = document.createElement("td")
           const td_ntske_interval = document.createElement("td")
           const td_ntske_last_received = document.createElement("td")
-
-          console.log("# " + i + ": " + info.clients[i].name)
 
           td_hostname.innerHTML = info.clients[i].hostname
           td_ntp_received.innerHTML = info.clients[i].ntp_received

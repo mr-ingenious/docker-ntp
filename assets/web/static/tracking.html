@@ -22,7 +22,7 @@
     const myRequest = new Request("/api/chrony/tracking");
 
     const table = document.createElement("table");
-    table.setAttribute("class", "table table-striped table-hover")
+    table.setAttribute("class", "table table-sm table-striped table-hover")
     const thead = document.createElement("thead");
 
     const tbody = document.createElement("tbody");
@@ -34,17 +34,17 @@
         //console.log(info)
         for (const kv of info.info) {
           const tr = document.createElement("tr")
-          const tdk = document.createElement("td")
+          const tdk = document.createElement("th")
+          tdk.setAttribute("scope", "row")
           const tdv = document.createElement("td")
 
-          tdk.innerHTML = kv.key
+          tdk.innerHTML = kv.key.replaceAll("_", " ")
           tdv.innerHTML = kv.value
 
           tr.appendChild(tdk)
+
           tr.appendChild(tdv)
           tbody.appendChild(tr)
-
-          //console.log(kv.key, " - ", kv.value)
         }
 
         table.appendChild(thead)

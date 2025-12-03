@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="20">
+  <meta http-equiv="refresh" content="10">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -15,7 +15,7 @@
   <div class="container mt-5">
     <h2>Source Statistics</h2>
     <div class="card mt-3 mr-3 ml-3" id="info">
-      <table class="table table-striped table-hover" id="sourcestats">
+      <table class="table table-sm table-striped table-hover" id="sourcestats">
         <thead>
           <tr>
             <th scope="col">Name</th>
@@ -44,7 +44,8 @@
 
         for (let i = 0; i < info.status.length; i++) {
           const tr = document.createElement("tr")
-          const td_name = document.createElement("td")
+          const td_name = document.createElement("th")
+          td_name.setAttribute("scope", "row")
           const td_np = document.createElement("td")
           const td_nr = document.createElement("td")
           const td_span = document.createElement("td")
@@ -52,7 +53,6 @@
           const td_freq_skew = document.createElement("td")
           const td_offset = document.createElement("td")
           const td_stdev = document.createElement("td")
-          console.log("# " + i + ": " + info.status[i].name)
 
           td_name.innerHTML = info.status[i].name
           td_np.innerHTML = info.status[i].np
