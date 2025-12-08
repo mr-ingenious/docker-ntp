@@ -15,7 +15,7 @@ RUN apk add --no-cache chrony tzdata logrotate && \
     rm /etc/chrony/chrony.conf && \
     mkdir /run/chrony /opt/www /opt/www/res && \
     chown -R chrony:chrony /etc/chrony /run/chrony /var/lib/chrony /var/log && \
-    chmod 1750 /etc/chrony /run/chrony /var/lib/chrony
+    chmod 1750 /etc/chrony /run/chrony /var/lib/chrony /var/log 
 
 # download bootstrap
 ADD https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css /opt/www/
@@ -45,7 +45,7 @@ EXPOSE 123/udp
 # web UI port
 EXPOSE 80/tcp
 
-VOLUME /etc/chrony /run/chrony /var/lib/chrony
+VOLUME /etc/chrony /run/chrony /var/lib/chrony /var/log
 
 # let docker know how to test container health
 HEALTHCHECK CMD chronyc -n tracking || exit 1

@@ -2,11 +2,10 @@
 
 set -e
 
-# DEFAULT_NTP="time.cloudflare.com"
-DEFAULT_NTP="1.pool.ntp.org,2.pool.ntp.org,3.pool.ntp.org,ntp3.fau.de,ntp2.fau.de,ntp1.fau.de,ntp0.fau.de,time.fu-berlin.de,zeit.fu-berlin.de,0.de.pool.ntp.org,tbtime1.ptb.de,ptbtime2.ptb.de,ptbtime3.ptb.de,2.europe.pool.ntp.org"
+DEFAULT_NTP="pool.ntp.org,europe.pool.ntp.org,time.cloudflare.com"
 CHRONY_CONF_FILE="/etc/chrony/chrony.conf"
 
-LOG_LEVEL=""
+LOG_LEVEL="0"
 
 CURRENT_USER="$(id -u)"
 CURRENT_GROUP="$(id -g)"
@@ -87,7 +86,7 @@ if [ -z "${LOG_LEVEL}" ]; then
   LOG_LEVEL=0
 else
   # confirm log level is between 0-3, since these are the only log levels supported
-  if [ "${LOG_LEVEL}" -gt 3 ]; then
+  if [ ${LOG_LEVEL} -lt 0 ] || [ ${LOG_LEVEL} -gt 3  ]; then
     # level outside of supported range, let's set to default (0)
     LOG_LEVEL=0
   fi
@@ -137,4 +136,4 @@ exec /bin/webserver &
 ## startup chronyd in the foreground
 echo " -- starting chronyd ..."
 ## exec /usr/sbin/chronyd -U -u chrony -d -x -L ${LOG_LEVEL}
-exec /usr/sbin/chronyd -U -u chrony -d -x -L 1 -l /var/log/chrony/chrony.log
+exec /usr/sbin/chronyd -U -u chrony -d -x -L ${LOG_LEVEL} -l /var/log/chrony/chrony.log

@@ -101,8 +101,6 @@ func chrony_info(option string) []byte {
 }
 
 func chrony_tracking(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("webserver: requested chrony tracking info.")
-
 	out := chrony_info("tracking")
 
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
@@ -170,8 +168,6 @@ ptbtime3.ptb.de             7   5  103m     +1.383      3.438  +3986us  2732us
 193.134.29.11              42  21   11h     -0.013      0.100  +1197us  2300us
 */
 func chrony_sourcestats(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("webserver: requested chrony tracking info.")
-
 	out := chrony_info("sourcestats")
 
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
@@ -240,8 +236,6 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 ^+ 193.134.29.11                 1  10   377   947  +2716us[+1562us] +/-   15ms
 */
 func chrony_sources(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("webserver: requested chrony sources info.")
-
 	out := chrony_info("sources")
 
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
@@ -311,8 +305,6 @@ testclient2                   78      0  10   -  1035       0      0   -     -
 */
 
 func chrony_clients(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("webserver: requested chrony clients info.")
-
 	out := chrony_info("clients")
 
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
@@ -383,8 +375,6 @@ NTP hardware TX timestamps : 0
 */
 
 func chrony_serverstats(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("webserver: requested chrony serverstats info.")
-
 	out := chrony_info("serverstats")
 
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
@@ -435,28 +425,28 @@ func chrony_config(w http.ResponseWriter, req *http.Request) {
 	filename := "/etc/chrony/" + return_filename
 
 	switch req.Method {
-	case "POST":
-		fmt.Println("chrony config file upload")
-		file, handler, err := req.FormFile("conf_filename")
-		if err != nil {
-			log.Println("Error retrieving the file:", err)
-			return
-		}
-		defer file.Close()
+	/*case "POST":
+	fmt.Println("chrony config file upload")
+	file, handler, err := req.FormFile("conf_filename")
+	if err != nil {
+		log.Println("Error retrieving the file:", err)
+		return
+	}
+	defer file.Close()
 
-		log.Printf("Uploaded File: %+v\n", handler.Filename)
-		log.Printf("File Size:     %+v\n", handler.Size)
-		log.Printf("MIME Header:   %+v\n", handler.Header)
+	log.Printf("Uploaded File: %+v\n", handler.Filename)
+	log.Printf("File Size:     %+v\n", handler.Size)
+	log.Printf("MIME Header:   %+v\n", handler.Header)
 
-		log.Println("File successfully uploaded.")
+	log.Println("File successfully uploaded.")
 
-		/* bodyBytes, err := io.ReadAll(req.Body)
-		if err != nil {
-			fmt.Println(err)
-		}
-		bodyString := string(bodyBytes)
-		fmt.Printf("file content:\n=======================================\n%s\n=======================================\n", bodyString)
-		*/
+	/* bodyBytes, err := io.ReadAll(req.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+	bodyString := string(bodyBytes)
+	fmt.Printf("file content:\n=======================================\n%s\n=======================================\n", bodyString)
+	*/
 	case "GET":
 		getFileContents(w, filename, return_filename, true)
 	case "HEAD":
@@ -474,7 +464,6 @@ func chrony_logfile(w http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case "GET":
-		fmt.Println("GET LOGFILE")
 		result := getFileContents(w, filename, return_filename, true)
 
 		if result.IsError {
@@ -484,7 +473,6 @@ func chrony_logfile(w http.ResponseWriter, req *http.Request) {
 			fmt.Fprintf(w, "")
 		}
 	case "HEAD":
-		fmt.Println("HEAD LOGFILE")
 		result := getFileContents(w, filename, return_filename, false)
 
 		if result.IsError {
@@ -518,7 +506,7 @@ func getFileContents(w http.ResponseWriter, filename string, return_filename str
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
 			line := scanner.Text()
-			fmt.Println(line)
+			// fmt.Println(line)
 			fmt.Fprintln(w, line)
 		}
 		// Check for errors during the scan
