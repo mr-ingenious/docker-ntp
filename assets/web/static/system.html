@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <title>Chrony</title>
+</head>
+
+<body>
+
+  <div class="container mt-5">
+    <h2>System</h2>
+
+    <div class="card mt-3 mr-3 ml-3" id="chrony_configfile_card">
+      <div class="card-body">
+        <h5 class="card-title">Chrony Config File</h5>
+
+        <a href="api/chrony/configfile" id="chrony_configfile" target="_blank">Chrony Config</a>
+
+        <!-- <form id="conffile_upload_form">
+          <div class="row">
+            <div class="col"><label for="conf_filename">Config Upload: </label>
+              <input id="conf_filename" name="conf_filename" type="file" size="10" accept="text/*">
+            </div>
+            <div class="col">
+              <button type="submit">upload</button>
+            </div>
+          </div>
+        </form> -->
+      </div>
+    </div>
+    <div class="card mt-3 mr-3 ml-3" id="chrony_logfile_card" hidden>
+      <div class="card-body">
+        <h5 class="card-title">Chrony Logs</h5>
+        <div class="row" id="chrony_logfile_download_option">
+          <a href="api/chrony/logfile" id="chrony_logfile" target="_blank">Chrony Logfile</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+
+    /*
+    function handleSubmit(event) {
+     event.preventDefault();
+     uploadFiles();
+   }
+
+   function uploadFiles() {
+     const url = '/api/chrony/configfile';
+     const formData = new FormData(formConffileUpload);
+     const filename = formData.get("conf_filename").name
+
+     if (filename != "") {
+       console.log("uploading data: ", formData)
+
+       const fetchOptions = {
+         method: 'post',
+         body: formData
+       };
+
+       fetch(url, fetchOptions);
+     }
+
+     document.getElementById('conffile_upload_form').reset()
+   } */
+
+    function getLogfileStatus() {
+      fetch("/api/chrony/logfile",
+        { method: "HEAD" }
+      ).then((res) => {
+        if (res.ok) {
+          document.getElementById("chrony_logfile_card").removeAttribute("hidden")
+        } else {
+          document.getElementById("chrony_logfile_card").setAttribute("hidden", true)
+        }
+      });
+    }
+
+    /* vconst formConffileUpload = document.getElementById('conffile_upload_form')
+    formConffileUpload.addEventListener('submit', handleSubmit);
+
+    const formLogLevel = document.getElementById('loglevel_form')
+    formConffileUpload.addEventListener('submit', handleSubmitLoglevel);
+    */
+
+    document.addEventListener('DOMContentLoaded', function () {
+      getLogfileStatus()
+    });
+  </script>
+
+  <script src="/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

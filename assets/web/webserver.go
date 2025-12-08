@@ -6,9 +6,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
 )
+
+type HttpServerStatus struct {
+	IsError      bool
+	Text         string
+	HttpResponse int
+	Err          error
+}
 
 type KeyValue struct {
 	Key   string `json:"key"`
@@ -422,6 +430,143 @@ func chrony_serverstats(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "%s", b)
 }
 
+func chrony_config(w http.ResponseWriter, req *http.Request) {
+	return_filename := "chrony.conf"
+	filename := "/etc/chrony/" + return_filename
+
+	switch req.Method {
+	case "POST":
+		fmt.Println("chrony config file upload")
+		file, handler, err := req.FormFile("conf_filename")
+		if err != nil {
+			log.Println("Error retrieving the file:", err)
+			return
+		}
+		defer file.Close()
+
+		log.Printf("Uploaded File: %+v\n", handler.Filename)
+		log.Printf("File Size:     %+v\n", handler.Size)
+		log.Printf("MIME Header:   %+v\n", handler.Header)
+
+		log.Println("File successfully uploaded.")
+
+		/* bodyBytes, err := io.ReadAll(req.Body)
+		if err != nil {
+			fmt.Println(err)
+		}
+		bodyString := string(bodyBytes)
+		fmt.Printf("file content:\n=======================================\n%s\n=======================================\n", bodyString)
+		*/
+	case "GET":
+		getFileContents(w, filename, return_filename, true)
+	case "HEAD":
+		getFileContents(w, filename, return_filename, false)
+	default:
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+	}
+
+	fmt.Fprintf(w, "success")
+}
+
+func chrony_logfile(w http.ResponseWriter, req *http.Request) {
+	return_filename := "chrony.log"
+	filename := "/var/log/chrony/" + return_filename
+
+	switch req.Method {
+	case "GET":
+		fmt.Println("GET LOGFILE")
+		result := getFileContents(w, filename, return_filename, true)
+
+		if result.IsError {
+			fmt.Println("GET LOGFILE ERROR: " + result.Text)
+			http.Error(w, result.Text, result.HttpResponse)
+		} else {
+			fmt.Fprintf(w, "")
+		}
+	case "HEAD":
+		fmt.Println("HEAD LOGFILE")
+		result := getFileContents(w, filename, return_filename, false)
+
+		if result.IsError {
+			fmt.Println("HEAD LOGFILE ERROR: " + result.Text)
+			http.Error(w, result.Text, result.HttpResponse)
+		} else {
+			fmt.Fprintf(w, "")
+		}
+	default:
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+	}
+}
+
+func getFileContents(w http.ResponseWriter, filename string, return_filename string, withContent bool) HttpServerStatus {
+	file, err := os.Open(filename)
+	if err != nil {
+		fmt.Printf("failed to open file: %s\n", err)
+		return HttpServerStatus{
+			IsError:      true,
+			Text:         `not found: ` + filename,
+			HttpResponse: http.StatusNotFound,
+			Err:          err,
+		}
+	}
+	defer file.Close()
+
+	w.Header().Add("Content-Type", "text/plain")
+	w.Header().Add("Content-Disposition", `attachment; filename="`+return_filename+`"`)
+
+	if withContent {
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			line := scanner.Text()
+			fmt.Println(line)
+			fmt.Fprintln(w, line)
+		}
+		// Check for errors during the scan
+		if err := scanner.Err(); err != nil {
+			fmt.Printf("error reading file: %s", err)
+			http.Error(w, "internal error reading file", http.StatusInternalServerError)
+			return HttpServerStatus{
+				IsError:      true,
+				Text:         "internal error reading file",
+				HttpResponse: http.StatusInternalServerError,
+				Err:          err,
+			}
+		}
+	}
+
+	return HttpServerStatus{
+		IsError:      false,
+		Text:         "success",
+		HttpResponse: http.StatusOK,
+		Err:          nil,
+	}
+}
+
+/*
+func chrony_loglevel(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case "POST":
+		fmt.Println("chrony POST loglevel")
+
+		bodyBytes, err := io.ReadAll(req.Body)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading body: %v\n", err)
+			return
+		}
+
+		fmt.Println("HTTP Response Body:")
+		fmt.Println(string(bodyBytes))
+	case "GET":
+		fmt.Println("chrony GET loglevel")
+	default:
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	fmt.Fprintf(w, "success")
+}
+*/
+
 func main() {
 	fileServer := http.FileServer(http.Dir("/opt/www"))
 	http.Handle("/", fileServer)
@@ -432,6 +577,9 @@ func main() {
 	http.HandleFunc("/api/chrony/serverstats", chrony_serverstats)
 	http.HandleFunc("/api/chrony/sources", chrony_sources)
 	http.HandleFunc("/api/chrony/clients", chrony_clients)
+	http.HandleFunc("/api/chrony/logfile", chrony_logfile)
+	http.HandleFunc("/api/chrony/configfile", chrony_config)
+	// http.HandleFunc("/api/chrony/loglevel", chrony_loglevel)
 
 	fmt.Printf("Starting server at port 80\n")
 	if err := http.ListenAndServe(":80", nil); err != nil {

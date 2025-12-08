@@ -6,8 +6,8 @@
 
 # IMAGE_NAME="mr-ingenious/ntp"
 # CONTAINER_NAME="ntp"
-IMAGE_NAME="chrony"
-CONTAINER_NAME="chrony"
+IMAGE_NAME="mringenious/ntp"
+CONTAINER_NAME="ntp"
 
 # (optional) define ntp server(s) to use
 # if none are provided a default is chosen

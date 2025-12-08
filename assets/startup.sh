@@ -136,4 +136,5 @@ echo " -- starting webserver ..."
 exec /bin/webserver &
 ## startup chronyd in the foreground
 echo " -- starting chronyd ..."
-exec /usr/sbin/chronyd -U -u chrony -d -x -L ${LOG_LEVEL}
+## exec /usr/sbin/chronyd -U -u chrony -d -x -L ${LOG_LEVEL}
+exec /usr/sbin/chronyd -U -u chrony -d -x -L 1 -l /var/log/chrony/chrony.log
