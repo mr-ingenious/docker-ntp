@@ -5,8 +5,6 @@ set -e
 DEFAULT_NTP="pool.ntp.org,europe.pool.ntp.org,time.cloudflare.com"
 CHRONY_CONF_FILE="/etc/chrony/chrony.conf"
 
-LOG_LEVEL="0"
-
 CURRENT_USER="$(id -u)"
 CURRENT_GROUP="$(id -g)"
 CURRENT_USERGROUP="$CURRENT_USER:$CURRENT_GROUP"
@@ -83,6 +81,7 @@ echo " -- NTP_SERVERS: ${NTP_SERVERS}"
 # LOG_LEVEL environment variable is not present, so populate with chrony default (0)
 # chrony log levels: 0 (informational), 1 (warning), 2 (non-fatal error) and 3 (fatal error)
 if [ -z "${LOG_LEVEL}" ]; then
+  echo "Log level variable not set, setting it to default"
   LOG_LEVEL=0
 else
   # confirm log level is between 0-3, since these are the only log levels supported
